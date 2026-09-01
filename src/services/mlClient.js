@@ -7,15 +7,16 @@ const fetch = require('node-fetch');
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
 // Get a freight rate forecast for a given route
-async function getFreightForecast(route) {
+async function getFreightForecast(route, cargo_type = 'container', horizon_days = 30) {
   const res = await fetch(`${ML_SERVICE_URL}/forecast`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ route }),
+    body: JSON.stringify({ route, cargo_type, horizon_days }),
   });
 
   if (!res.ok) {
-    throw new Error(`ML service error: ${res.status}`);
+    const errData = await res.json();
+    throw new Error(`ML service error details: ${errData.detail}`);
   }
 
   return res.json();
