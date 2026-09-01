@@ -1,65 +1,148 @@
-# models/freight_forecast.py
-#
-# MVP forecasting model: simple moving average + linear trend extrapolation.
-# This is intentionally simple so the pipeline works end-to-end first.
-# Upgrade path: swap this out for Facebook Prophet without changing the
-# function signature (predict_forecast still returns the same shape).
+"""
+models/freight_forecast.py
 
-import os
-import pandas as pd
+Serves freight-rate forecasts from the trained GradientBoostingRegressor
+in models/trained/freight_forecast_model.joblib (see
+training/train_freight_forecast.py).
+
+Public entry point keeps the same shape as the original placeholder so
+cargoai-backend/src/services/mlClient.js and app.py do not need to change:
+
+    forecast(route: str, cargo_type: str, horizon_days: int = 30) -> dict
+
+If the trained artifact is missing (e.g. a fresh clone before anyone has
+run the training scripts), this falls back to the original moving-average
++ linear-trend estimate so the service still boots and responds.
+"""
+
+import json
+from datetime import datetime, timedelta
+from pathlib import Path
+from functools import lru_cache
+
 import numpy as np
-from datetime import timedelta
+import pandas as pd
 
-DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "historical_rates.csv")
-
-
-def _load_route_data(route: str) -> pd.DataFrame:
-    df = pd.read_csv(DATA_PATH, parse_dates=["date"])
-    route_df = df[df["route"] == route].sort_values("date")
-    return route_df
+ROOT = Path(__file__).resolve().parent.parent
+MODEL_PATH = ROOT / "models" / "trained" / "freight_forecast_model.joblib"
+CONTEXT_PATH = ROOT / "models" / "trained" / "freight_forecast_context.json"
+HISTORICAL_CSV = ROOT / "data" / "historical_rates.csv"
 
 
-def predict_forecast(route: str, periods: int = 4, window: int = 3) -> dict:
+@lru_cache(maxsize=1)
+def _load_model():
+    try:
+        import joblib
+        return joblib.load(MODEL_PATH)
+    except FileNotFoundError:
+        return None
+
+
+@lru_cache(maxsize=1)
+def _load_context():
+    try:
+        return {
+            (row["route"], row["cargo_type"]): row
+            for row in json.loads(CONTEXT_PATH.read_text())
+        }
+    except FileNotFoundError:
+        return {}
+
+
+def _fallback_moving_average(route: str, cargo_type: str, horizon_days: int) -> dict:
+    """Original placeholder behaviour, kept as a safety net."""
+    df = pd.read_csv(HISTORICAL_CSV)
+    subset = df[(df["route"] == route) & (df["cargo_type"] == cargo_type)].sort_values("date")
+    if subset.empty:
+        subset = df[df["cargo_type"] == cargo_type].sort_values("date")
+    rates = subset["freight_rate_usd_per_ton"].tail(30).to_numpy()
+    if len(rates) == 0:
+        rates = df["freight_rate_usd_per_ton"].to_numpy()
+
+    moving_avg = float(np.mean(rates[-14:])) if len(rates) >= 14 else float(np.mean(rates))
+    trend = float(np.polyfit(range(len(rates)), rates, 1)[0]) if len(rates) > 1 else 0.0
+
+    last_date = pd.to_datetime(subset["date"]).max() if not subset.empty else pd.Timestamp.today()
+    predictions = []
+    for step in range(1, horizon_days + 1):
+        predictions.append({
+            "date": (last_date + timedelta(days=step)).date().isoformat(),
+            "predicted_rate_usd_per_ton": round(moving_avg + trend * step, 2),
+        })
+    return {
+        "route": route,
+        "cargo_type": cargo_type,
+        "model": "moving_average_fallback",
+        "predictions": predictions,
+    }
+
+
+def is_trained_model_loaded() -> bool:
+    """True if the trained GBM artifact loaded successfully (vs. fallback)."""
+    return _load_model() is not None
+
+
+def forecast(route: str, cargo_type: str, horizon_days: int = 30) -> dict:
     """
-    Returns a simple forecast for the given route.
+    Forecast freight rate (USD/ton) for `route` + `cargo_type` over the
+    next `horizon_days` days.
 
-    - Uses a moving average of the last `window` points as the base level.
-    - Extrapolates a linear trend from the last `window` points forward.
-    - `periods` = number of future weekly points to generate.
+    Returns:
+        {
+          "route": str,
+          "cargo_type": str,
+          "model": "gradient_boosting_regressor",
+          "predictions": [{"date": "YYYY-MM-DD", "predicted_rate_usd_per_ton": float}, ...]
+        }
     """
-    route_df = _load_route_data(route)
+    model = _load_model()
+    if model is None:
+        return _fallback_moving_average(route, cargo_type, horizon_days)
 
-    if route_df.empty:
-        # No historical data for this route yet — return a flat placeholder
-        # so the frontend still has something sensible to show.
-        today = pd.Timestamp.today().normalize()
-        forecast_points = [
-            {"date": (today + timedelta(weeks=i + 1)).strftime("%Y-%m-%d"), "predictedRate": 15.0}
-            for i in range(periods)
-        ]
-        return {"route": route, "forecast": forecast_points, "trend": "UNKNOWN (no data)"}
+    context = _load_context()
+    ctx = context.get((route, cargo_type))
+    if ctx is None:
+        # unseen route/cargo combo -> fall back to averages across cargo type
+        return _fallback_moving_average(route, cargo_type, horizon_days)
 
-    rates = route_df["rate_usd_per_mt"].values
-    dates = route_df["date"].values
+    last_date = pd.to_datetime(ctx["date"])
+    fuel_price = ctx["fuel_price_index"]
+    rate_lag_7 = ctx["rate_lag_7"]
+    rate_lag_30 = ctx["freight_rate_usd_per_ton"]  # most recent actual, used as the 30-day lag proxy
 
-    recent = rates[-window:]
-    moving_avg = float(np.mean(recent))
-
-    # crude linear trend: average week-over-week change over the recent window
-    diffs = np.diff(recent)
-    avg_change = float(np.mean(diffs)) if len(diffs) > 0 else 0.0
-
-    last_date = pd.Timestamp(dates[-1])
-    forecast_points = []
-    level = moving_avg
-    for i in range(periods):
-        level = level + avg_change
-        next_date = last_date + timedelta(weeks=i + 1)
-        forecast_points.append({
-            "date": next_date.strftime("%Y-%m-%d"),
-            "predictedRate": round(level, 2),
+    rows = []
+    running_rate = ctx["freight_rate_usd_per_ton"]
+    for step in range(1, horizon_days + 1):
+        d = last_date + timedelta(days=step)
+        doy = d.dayofyear
+        rows.append({
+            "route": route,
+            "cargo_type": cargo_type,
+            "fuel_price_index": fuel_price,
+            "day_of_year_sin": np.sin(2 * np.pi * doy / 365.25),
+            "day_of_year_cos": np.cos(2 * np.pi * doy / 365.25),
+            "days_since_start": ctx.get("days_since_start", 0) + step,
+            "rate_lag_7": rate_lag_7 if step <= 7 else running_rate,
+            "rate_lag_30": rate_lag_30,
         })
 
-    trend = "RISING" if avg_change > 0.05 else "FALLING" if avg_change < -0.05 else "STABLE"
+    features = pd.DataFrame(rows)
+    preds = model.predict(features)
 
-    return {"route": route, "forecast": forecast_points, "trend": trend}
+    predictions = []
+    for step, p in enumerate(preds, start=1):
+        d = (last_date + timedelta(days=step)).date().isoformat()
+        predictions.append({"date": d, "predicted_rate_usd_per_ton": round(float(p), 2)})
+    running_rate = float(preds[-1])
+
+    return {
+        "route": route,
+        "cargo_type": cargo_type,
+        "model": "gradient_boosting_regressor",
+        "predictions": predictions,
+    }
+
+
+if __name__ == "__main__":
+    import pprint
+    pprint.pprint(forecast("Singapore-Rotterdam", "container", horizon_days=7))
