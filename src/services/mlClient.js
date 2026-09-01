@@ -8,7 +8,7 @@ const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 
 // Get a freight rate forecast for a given route
 async function getFreightForecast(route) {
-  const res = await fetch(`${ML_SERVICE_URL}/predict/forecast`, {
+  const res = await fetch(`${ML_SERVICE_URL}/forecast`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ route }),
@@ -23,7 +23,7 @@ async function getFreightForecast(route) {
 
 // Get vessel feasibility + risk score for a cargo/vessel/port combination
 async function getVesselFeasibility(cargoDetails) {
-  const res = await fetch(`${ML_SERVICE_URL}/predict/feasibility`, {
+  const res = await fetch(`${ML_SERVICE_URL}/feasibility`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(cargoDetails),
