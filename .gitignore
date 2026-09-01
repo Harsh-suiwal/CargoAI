@@ -1,0 +1,12 @@
+# Node
+node_modules/
+.env
+
+# Python
+cargoai-ml/venv/
+cargoai-ml/__pycache__/
+cargoai-ml/models/__pycache__/
+*.pyc
+
+# OS
+.DS_Store
