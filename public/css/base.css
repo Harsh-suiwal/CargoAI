@@ -1,0 +1,202 @@
+/* public/css/base.css
+   CargoAI design tokens — nautical chart / cargo manifest aesthetic.
+   Shared by every page. Page-specific CSS imports this file.
+*/
+
+:root {
+  /* Color */
+  --sea-deep: #0b2436;
+  --sea-mid: #123449;
+  --sea-line: #1c4a63;
+  --chart-paper: #e8e1cf;
+  --chart-paper-dim: #d9d0b8;
+  --ink: #16232b;
+  --ink-soft: #4a5a63;
+  --brass: #c08a3e;
+  --brass-light: #d9a852;
+  --teal: #3f8f8a;
+  --risk-low: #3e7c59;
+  --risk-medium: #c08a3e;
+  --risk-high: #b23a2e;
+
+  /* Type */
+  --font-display: 'Oswald', sans-serif;
+  --font-body: 'IBM Plex Sans', sans-serif;
+
+  /* Layout */
+  --content-width: 760px;
+  --border: 1px solid rgba(232, 225, 207, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--sea-deep);
+  color: var(--chart-paper);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--brass-light);
+}
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 32px 0;
+  color: var(--brass-light);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.nav-back:hover {
+  color: var(--brass);
+}
+
+.page {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 8px 32px 80px;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 2.2rem;
+  letter-spacing: 0.01em;
+  color: var(--chart-paper);
+  margin: 24px 0 8px;
+}
+
+.subtext {
+  color: var(--chart-paper-dim);
+  font-size: 1rem;
+  max-width: 46ch;
+  margin-bottom: 32px;
+}
+
+/* Manifest-style panel: bordered ledger block, not a shadow-card */
+.manifest {
+  border: var(--border);
+  background: var(--sea-mid);
+}
+
+.manifest-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: var(--border);
+  font-variant-numeric: tabular-nums;
+}
+
+.manifest-row:last-child {
+  border-bottom: none;
+}
+
+.manifest-row .label {
+  color: var(--chart-paper-dim);
+  font-size: 0.92rem;
+}
+
+.manifest-row .value {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--chart-paper);
+}
+
+.manifest-header {
+  padding: 16px 20px;
+  border-bottom: var(--border);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  color: var(--brass-light);
+}
+
+/* Status pill, used for risk / recommendation */
+.status {
+  display: inline-block;
+  padding: 3px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid currentColor;
+}
+
+.status.low { color: var(--risk-low); }
+.status.medium { color: var(--risk-medium); }
+.status.high { color: var(--risk-high); }
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 13px 28px;
+  background: var(--brass);
+  color: var(--sea-deep);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn:hover {
+  background: var(--brass-light);
+}
+
+.btn.secondary {
+  background: transparent;
+  color: var(--chart-paper);
+  border: 1px solid rgba(232, 225, 207, 0.35);
+}
+
+.btn.secondary:hover {
+  border-color: var(--chart-paper);
+}
+
+/* Forms */
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--chart-paper-dim);
+}
+
+input, select {
+  padding: 11px 12px;
+  border: var(--border);
+  background: var(--sea-mid);
+  color: var(--chart-paper);
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+input:focus, select:focus, .btn:focus, a:focus {
+  outline: 2px solid var(--brass-light);
+  outline-offset: 2px;
+}
+
+::placeholder {
+  color: rgba(232, 225, 207, 0.4);
+}
+
+footer {
+  padding: 40px 32px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  border-top: var(--border);
+  margin-top: 60px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

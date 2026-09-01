@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CargoAI — Freight Forecast</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/public/css/base.css" />
+  <link rel="stylesheet" href="/public/css/forecast.css" />
+</head>
+<body>
+  <a href="/" class="nav-back">&larr; Home</a>
+
+  <main class="page">
+    <p class="eyebrow-small">Rate outlook</p>
+    <h1>Freight forecast</h1>
+    <p class="subtext">Projected freight rate for the next four weeks on the selected route.</p>
+
+    <label style="max-width:320px;margin-bottom:24px">Route
+      <select id="route-select">
+        <option value="Australia-Paradip">Australia &rarr; Paradip</option>
+        <option value="Indonesia-Vizag">Indonesia &rarr; Vizag</option>
+        <option value="Russia-Haldia">Russia &rarr; Haldia</option>
+      </select>
+    </label>
+
+    <div id="forecast-result" class="manifest">
+      <p class="subtext" style="padding:20px">Loading forecast...</p>
+    </div>
+  </main>
+
+  <footer>
+    Team Bug Slayer &middot; IIIT Sonepat &middot; Code Build 2026
+  </footer>
+
+  <script src="/public/js/forecast.js"></script>
+</body>
+</html>

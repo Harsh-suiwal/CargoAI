@@ -1,0 +1,25 @@
+/* public/css/dashboard.css */
+
+.eyebrow-small {
+  font-size: 0.82rem;
+  color: var(--brass-light);
+  margin: 24px 0 0;
+}
+
+.recommendation-banner {
+  border: 1px solid currentColor;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recommendation-banner .rec-label {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 0.02em;
+}
+
+.recommendation-banner.book { color: var(--risk-low); }
+.recommendation-banner.wait { color: var(--risk-medium); }

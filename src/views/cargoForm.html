@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CargoAI — Plan a Voyage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/public/css/base.css" />
+  <link rel="stylesheet" href="/public/css/cargoForm.css" />
+</head>
+<body>
+  <a href="/" class="nav-back">&larr; Home</a>
+
+  <main class="page">
+    <p class="eyebrow-small">Voyage entry</p>
+    <h1>Plan a voyage</h1>
+    <p class="subtext">Enter the cargo and route. CargoAI checks it against port and vessel limits and returns a feasibility read.</p>
+
+    <form id="cargo-form" class="manifest">
+      <label>Cargo type
+        <input type="text" id="cargoType" placeholder="e.g. Coal" required />
+      </label>
+
+      <label>Quantity (MT)
+        <input type="number" id="quantityMT" placeholder="e.g. 80000" required />
+      </label>
+
+      <label>Vessel type
+        <select id="vesselType" required>
+          <option value="">Select vessel type</option>
+          <option value="Handysize">Handysize</option>
+          <option value="Supramax">Supramax</option>
+          <option value="Panamax">Panamax</option>
+          <option value="Capesize">Capesize</option>
+        </select>
+      </label>
+
+      <label>Origin
+        <input type="text" id="origin" placeholder="e.g. Australia" required />
+      </label>
+
+      <label>Destination
+        <input type="text" id="destination" placeholder="e.g. Paradip" required />
+      </label>
+
+      <button type="submit" class="btn">Evaluate feasibility</button>
+    </form>
+
+    <div id="result"></div>
+  </main>
+
+  <footer>
+    Team Bug Slayer &middot; IIIT Sonepat &middot; Code Build 2026
+  </footer>
+
+  <script src="/public/js/cargoForm.js"></script>
+</body>
+</html>

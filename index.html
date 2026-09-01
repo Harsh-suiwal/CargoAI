@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CargoAI — Predictive Freight Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/public/css/base.css" />
+  <link rel="stylesheet" href="/public/css/landing.css" />
+</head>
+<body>
+
+  <section class="hero">
+    <svg class="chart-bg" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- Graticule -->
+      <g stroke="#e8e1cf" stroke-opacity="0.08" stroke-width="1">
+        <line x1="0" y1="80" x2="1000" y2="80" />
+        <line x1="0" y1="180" x2="1000" y2="180" />
+        <line x1="0" y1="280" x2="1000" y2="280" />
+        <line x1="0" y1="380" x2="1000" y2="380" />
+        <line x1="0" y1="480" x2="1000" y2="480" />
+        <line x1="0" y1="580" x2="1000" y2="580" />
+        <line x1="120" y1="0" x2="120" y2="620" />
+        <line x1="280" y1="0" x2="280" y2="620" />
+        <line x1="440" y1="0" x2="440" y2="620" />
+        <line x1="600" y1="0" x2="600" y2="620" />
+        <line x1="760" y1="0" x2="760" y2="620" />
+        <line x1="920" y1="0" x2="920" y2="620" />
+      </g>
+
+      <!-- Voyage route: Australia to East Coast India ports -->
+      <path d="M 860 470 Q 600 380, 430 300 Q 300 240, 190 190" fill="none" stroke="#c08a3e" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.85" />
+
+      <!-- Origin -->
+      <circle cx="860" cy="470" r="5" fill="#d9a852" />
+      <text x="874" y="474" fill="#d9d0b8" font-family="IBM Plex Sans" font-size="13">Australia</text>
+
+      <!-- Port waypoints -->
+      <circle cx="430" cy="300" r="4" fill="#3f8f8a" />
+      <text x="442" y="304" fill="#d9d0b8" font-family="IBM Plex Sans" font-size="12">Vizag</text>
+
+      <circle cx="330" cy="255" r="4" fill="#3f8f8a" />
+      <text x="342" y="259" fill="#d9d0b8" font-family="IBM Plex Sans" font-size="12">Gangavaram</text>
+
+      <circle cx="190" cy="190" r="5" fill="#d9a852" />
+      <text x="204" y="194" fill="#e8e1cf" font-family="IBM Plex Sans" font-size="13">Paradip</text>
+
+      <circle cx="150" cy="140" r="4" fill="#3f8f8a" />
+      <text x="162" y="144" fill="#d9d0b8" font-family="IBM Plex Sans" font-size="12">Haldia</text>
+    </svg>
+
+    <a href="#" class="nav-back" style="visibility:hidden">placeholder</a>
+
+    <div class="hero-content">
+      <p class="eyebrow">Australia &mdash; East Coast India</p>
+      <h1 class="hero-title">Chart the freight market<br>before you charter.</h1>
+      <p class="hero-sub">
+        CargoAI reads freight rates, port congestion, and vessel constraints together,
+        so a booking decision is a forecast instead of a guess.
+      </p>
+      <div class="hero-actions">
+        <a href="/cargo-form" class="btn">Plan a voyage</a>
+        <a href="/dashboard" class="btn secondary">Open dashboard</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="page approach">
+    <div class="approach-col">
+      <p class="col-label">Today</p>
+      <p class="col-text">Check the spot market, take whatever vessel is available, sign, and repeat &mdash; with no view of where rates or port congestion are headed.</p>
+    </div>
+    <div class="approach-col accent">
+      <p class="col-label">With CargoAI</p>
+      <p class="col-text">Forecast freight rates ahead of time, check a vessel against real port limits, and see a book / wait signal before you commit.</p>
+    </div>
+  </section>
+
+  <section class="page pipeline">
+    <h2 class="section-title">How a recommendation gets made</h2>
+    <div class="pipeline-row">
+      <div class="pipeline-step">
+        <p class="step-name">Market &amp; port data</p>
+        <p class="step-desc">Freight rates, commodity prices, seasonality, port congestion</p>
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <p class="step-name">Forecast engine</p>
+        <p class="step-desc">Time-series rate prediction for the route</p>
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <p class="step-name">Feasibility check</p>
+        <p class="step-desc">Vessel size against port and berth limits</p>
+      </div>
+      <div class="pipeline-arrow">&rarr;</div>
+      <div class="pipeline-step">
+        <p class="step-name">Book / wait signal</p>
+        <p class="step-desc">One recommendation with the risk behind it</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Team Bug Slayer &middot; IIIT Sonepat &middot; Code Build 2026
+  </footer>
+
+</body>
+</html>

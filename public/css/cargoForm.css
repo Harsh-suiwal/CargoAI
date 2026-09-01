@@ -1,0 +1,31 @@
+/* public/css/cargoForm.css */
+
+.eyebrow-small {
+  font-size: 0.82rem;
+  color: var(--brass-light);
+  margin: 24px 0 0;
+}
+
+#cargo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 420px;
+  padding: 24px;
+  margin-top: 12px;
+}
+
+#result {
+  margin-top: 28px;
+  max-width: 420px;
+}
+
+#result .manifest {
+  margin-top: 4px;
+}
+
+#result .manifest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

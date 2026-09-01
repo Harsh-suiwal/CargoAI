@@ -1,0 +1,17 @@
+/* public/css/forecast.css */
+
+.eyebrow-small {
+  font-size: 0.82rem;
+  color: var(--brass-light);
+  margin: 24px 0 0;
+}
+
+#forecast-result {
+  max-width: 480px;
+}
+
+.trend-note {
+  padding: 14px 20px;
+  color: var(--chart-paper-dim);
+  font-size: 0.9rem;
+}
