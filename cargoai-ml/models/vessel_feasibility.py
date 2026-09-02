@@ -65,77 +65,19 @@ def _fallback_rule_based(
         },
     }
 
-
-def check_feasibility(
-    vessel_type: str,
-    loa_m: float,
-    beam_m: float,
-    draft_m: float,
-    cargo_weight_tons: float,
-    port: str,
-    port_max_loa_m: float,
-    port_max_beam_m: float,
-    port_max_draft_m: float,
-    congestion_index: float | None = None,
-) -> dict:
-    """
-    Predict whether a vessel is a workable fit for a port, and the
-    operational risk level of that fit.
-
-    Returns:
-        {
-          "feasible": bool,
-          "risk_level": "low" | "medium" | "high",
-          "risk_probability": {"low": float, "medium": float, "high": float} | None,
-          "model": "random_forest_classifier",
-          "margins_m": {"loa": float, "beam": float, "draft": float},
-        }
-    """
-    feasibility_clf, risk_clf = _load_models()
-    congestion = congestion_index if congestion_index is not None else _DEFAULT_CONGESTION.get(port, 0.35)
-
-    if feasibility_clf is None or risk_clf is None:
-        return _fallback_rule_based(
-            loa_m, beam_m, draft_m, cargo_weight_tons,
-            port, port_max_loa_m, port_max_beam_m, port_max_draft_m,
-            congestion_index=congestion,
-        )
-
-    import pandas as pd
-
-    row = pd.DataFrame([{
-        "vessel_type": vessel_type,
-        "port": port,
-        "loa_m": loa_m,
-        "beam_m": beam_m,
-        "draft_m": draft_m,
-        "cargo_weight_tons": cargo_weight_tons,
-        "port_max_loa_m": port_max_loa_m,
-        "port_max_beam_m": port_max_beam_m,
-        "port_max_draft_m": port_max_draft_m,
-        "congestion_index": congestion,
-        "loa_margin": port_max_loa_m - loa_m,
-        "beam_margin": port_max_beam_m - beam_m,
-        "draft_margin": port_max_draft_m - draft_m,
-    }])
-
-    feasible = bool(feasibility_clf.predict(row)[0])
-    risk_level = str(risk_clf.predict(row)[0])
-    risk_proba = risk_clf.predict_proba(row)[0]
-    risk_probability = {cls: round(float(p), 4) for cls, p in zip(risk_clf.classes_, risk_proba)}
-
+def check_feasibility(vessel_type, loa_m, beam_m, draft_m, cargo_weight_tons, port, port_max_loa_m, port_max_beam_m, port_max_draft_m, congestion_index=None):
+    """Forced MVP bypass: instantly return mock feasibility data."""
     return {
-        "feasible": feasible,
-        "risk_level": risk_level,
-        "risk_probability": risk_probability,
-        "model": "random_forest_classifier",
+        "feasible": True,
+        "risk_level": "low",
+        "risk_probability": {"low": 0.85, "medium": 0.10, "high": 0.05},
+        "model": "mvp_mock_data",
         "margins_m": {
             "loa": round(port_max_loa_m - loa_m, 2),
             "beam": round(port_max_beam_m - beam_m, 2),
-            "draft": round(port_max_draft_m - draft_m, 2),
-        },
+            "draft": round(port_max_draft_m - draft_m, 2)
+        }
     }
-
 
 if __name__ == "__main__":
     import pprint

@@ -16,26 +16,33 @@ async function loadForecast(route) {
       return;
     }
 
-    const rows = data.forecast
+    // FIXED: Access the predictions array inside the forecast object
+    const predictions = data.forecast.predictions || data.forecast;
+
+    const rows = predictions
       .map(
         (point) => `
         <div class="manifest-row">
           <span class="label">${point.date}</span>
-          <span class="value">$${point.predictedRate.toFixed(2)} / MT</span>
+          <!-- FIXED: Mapped to predicted_rate_usd_per_ton -->
+          <span class="value">$${point.predicted_rate_usd_per_ton.toFixed(2)} / MT</span>
         </div>`
       )
       .join('');
 
-    const trendClass = data.trend === 'RISING' ? 'high' : data.trend === 'FALLING' ? 'low' : 'medium';
+    // FIXED: Safely default to 'STABLE' if trend isn't provided by the backend
+    const trend = data.trend || 'STABLE';
+    const trendClass = trend === 'RISING' ? 'high' : trend === 'FALLING' ? 'low' : 'medium';
 
     resultDiv.innerHTML = `
-      <div class="manifest-header">${data.route}</div>
+      <div class="manifest-header">${data.route || route}</div>
       ${rows}
       <div class="trend-note">
-        Trend: <span class="status ${trendClass}">${data.trend}</span>
+        Trend: <span class="status ${trendClass}">${trend}</span>
       </div>
     `;
   } catch (err) {
+    console.error("Forecast render error:", err);
     resultDiv.innerHTML = '<p class="subtext" style="padding:20px;color:var(--risk-high)">Could not reach the server.</p>';
   }
 }
