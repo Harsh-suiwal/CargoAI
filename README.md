@@ -1,4 +1,4 @@
-# CargoAI — MVP Submission
+# CargoAI — MVP
 
 **Team Bug Slayer | Code Build 2026 | IIIT Sonepat**
 
